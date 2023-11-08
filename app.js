@@ -34,9 +34,38 @@ app.post("/register",async(req,res)=>{
         password:bcrypt.hashSync(password,8)
     })
 
-    res.send("User registered Successfully")
+    res.redirect("/login")
 })
 
+app.get("/login",(req,res)=>{
+    res.render("login.ejs")
+})
+
+app.post("/login",async(req,res)=>{
+    const email =req.body.email
+    const password =req.body.password
+
+    //1st: tyo emial vako koi user table ma xah ki nai
+const userExists = await users.findAll({
+    where:{
+        email:email
+    }
+})
+if(userExists.length>0){
+    //2nd : password check garne
+ const isMatch= bcrypt.compareSync(password,userExists[0].password)
+if (isMatch){
+    res.send("Logged in succesfully")
+}
+    else{
+    res.send("Invalid Email or Password")
+}
+}
+else
+{
+    res.send("Invalid Email or password ")
+}
+})
 app.listen(3000,function(){
     console.log("NodeJs project has started at port 3000")
     
